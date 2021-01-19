@@ -17,3 +17,10 @@ Also, a few manual tweaks are needed:
 
 * https://github.com/nextcloud/server/issues/24914
 * https://github.com/nextcloud/server/issues/24915
+
+
+The image is already available at https://quay.io/repository/eminguez/nextcloud-container-fix-nfs
+
+```
+podman pull quay.io/eminguez/nextcloud-container-fix-nfs
+```
