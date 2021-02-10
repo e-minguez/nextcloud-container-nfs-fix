@@ -4,14 +4,14 @@
  *
  * @author Bart Visscher <bartv@thisnet.nl>
  * @author Christoph Wurst <christoph@winzerhof-wurst.at>
- * @author Estelle Poulin <dev@inspiredby.es>
+ * @author hoellen <dev@hoellen.eu>
+ * @author J0WI <J0WI@users.noreply.github.com>
  * @author Joas Schilling <coding@schilljs.com>
  * @author Ko- <k.stoffelen@cs.ru.nl>
  * @author Lukas Reschke <lukas@statuscode.ch>
  * @author Michael Weimann <mail@michael-weimann.eu>
  * @author Morris Jobke <hey@morrisjobke.de>
  * @author Patrick Paysant <patrick.paysant@linagora.com>
- * @author RealRancor <fisch.666@gmx.de>
  * @author Roeland Jago Douma <roeland@famdouma.nl>
  * @author Thomas Müller <thomas.mueller@tmit.eu>
  * @author Victor Dubiniuk <dubiniuk@owncloud.com>
@@ -61,7 +61,7 @@ try {
 	set_exception_handler('exceptionHandler');
 
 	if (!function_exists('posix_getuid')) {
-		echo "The posix extensions are required - see http://php.net/manual/en/book.posix.php" . PHP_EOL;
+		echo "The posix extensions are required - see https://www.php.net/manual/en/book.posix.php" . PHP_EOL;
 		exit(1);
 	}
 	$user = posix_getuid();
@@ -87,7 +87,7 @@ try {
 	}
 
 	if (!function_exists('pcntl_signal') && !in_array('--no-warnings', $argv)) {
-		echo "The process control (PCNTL) extensions are required in case you want to interrupt long running commands - see http://php.net/manual/en/book.pcntl.php" . PHP_EOL;
+		echo "The process control (PCNTL) extensions are required in case you want to interrupt long running commands - see https://www.php.net/manual/en/book.pcntl.php" . PHP_EOL;
 	}
 
 	$application = new Application(
@@ -104,4 +104,3 @@ try {
 } catch (Error $ex) {
 	exceptionHandler($ex);
 }
-
