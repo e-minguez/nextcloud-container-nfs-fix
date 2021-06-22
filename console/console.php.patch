@@ -1,6 +1,6 @@
---- console.php.orig-as-of-2021-02-10	2021-02-10 14:15:05.023375089 +0100
-+++ console.php	2021-02-10 14:16:11.142226244 +0100
-@@ -72,7 +72,8 @@
+--- console.php.orig-as-of-2021-06-22	2021-06-22 10:17:20.586528207 +0200
++++ console.php	2021-06-22 10:19:03.975265190 +0200
+@@ -71,7 +71,8 @@
  		echo "Owner id of config.php: " . $configUser . PHP_EOL;
  		echo "Try adding 'sudo -u #" . $configUser . "' to the beginning of the command (without the single quotes)" . PHP_EOL;
  		echo "If running with 'docker exec' try adding the option '-u " . $configUser . "' to the docker command (without the single quotes)" . PHP_EOL;

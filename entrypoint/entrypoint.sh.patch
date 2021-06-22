@@ -1,21 +1,16 @@
---- entrypoint.sh.orig-as-of-2021-01-19	2021-01-19 11:56:58.340136110 +0100
-+++ entrypoint.sh	2020-12-23 16:42:08.752173581 +0100
-@@ -91,11 +91,8 @@
+--- entrypoint.sh	2021-06-22 10:22:16.321496701 +0200
++++ entrypoint.sh.orig-as-of-2021-06-22	2021-06-22 10:21:54.899136792 +0200
+@@ -96,8 +96,11 @@
              echo "Upgrading nextcloud from $installed_version ..."
              run_as 'php /var/www/html/occ app:list' | sed -n "/Enabled:/,/Disabled:/p" > /tmp/list_before
          fi
--        if [ "$(id -u)" = 0 ]; then
--            rsync_options="-rlDog --chown www-data:root"
--        else
--            rsync_options="-rlD"
--        fi
-+        rsync_options="-rlD"
-+
+-        rsync_options="-rlD"
+-
++        if [ "$(id -u)" = 0 ]; then
++            rsync_options="-rlDog --chown www-data:root"
++        else
++            rsync_options="-rlD"
++        fi
          rsync $rsync_options --delete --exclude-from=/upgrade.exclude /usr/src/nextcloud/ /var/www/html/
  
          for dir in config data custom_apps themes; do
-@@ -187,4 +184,3 @@
- fi
- 
- exec "$@"
--
