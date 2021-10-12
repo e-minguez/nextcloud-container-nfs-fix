@@ -20,6 +20,7 @@
  * @author Steffen Lindner <mail@steffen-lindner.de>
  * @author Thomas Müller <thomas.mueller@tmit.eu>
  * @author Vincent Petry <vincent@nextcloud.com>
+ * @author Stephen Michel <git@smichel.me>
  *
  * @license AGPL-3.0
  *
@@ -101,7 +102,7 @@ try {
 			echo "Current user id: " . $user . PHP_EOL;
 			echo "Owner id of config.php: " . $configUser . PHP_EOL;
 			# TEMP FIX FOR https://github.com/nextcloud/server/issues/24915
-			#exit(1);
++			#exit(1);
 		}
 
 
@@ -159,6 +160,10 @@ try {
 	exit();
 } catch (Exception $ex) {
 	\OC::$server->getLogger()->logException($ex, ['app' => 'cron']);
+	echo $ex . PHP_EOL;
+	exit(1);
 } catch (Error $ex) {
 	\OC::$server->getLogger()->logException($ex, ['app' => 'cron']);
+	echo $ex . PHP_EOL;
+	exit(1);
 }
