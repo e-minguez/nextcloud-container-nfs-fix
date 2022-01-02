@@ -102,7 +102,7 @@ try {
 			echo "Current user id: " . $user . PHP_EOL;
 			echo "Owner id of config.php: " . $configUser . PHP_EOL;
 			# TEMP FIX FOR https://github.com/nextcloud/server/issues/24915
-+			#exit(1);
+			#exit(1);
 		}
 
 
