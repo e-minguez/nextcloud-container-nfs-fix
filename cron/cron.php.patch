@@ -1,5 +1,5 @@
---- cron.php.orig-as-of-2021-10-12	2021-10-12 16:05:06.236000000 +0200
-+++ cron.php	2021-10-12 16:05:38.175561081 +0200
+--- cron.php.orig-as-of-2022-05-03	2022-05-03 09:52:42.202712198 +0200
++++ cron.php	2022-05-03 09:53:30.638853531 +0200
 @@ -101,7 +101,8 @@
  			echo "Console has to be executed with the user that owns the file config/config.php" . PHP_EOL;
  			echo "Current user id: " . $user . PHP_EOL;

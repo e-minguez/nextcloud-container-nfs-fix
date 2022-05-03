@@ -1,5 +1,5 @@
---- entrypoint.sh.orig-as-of-2021-10-22	2021-10-12 16:06:58.621000000 +0200
-+++ entrypoint.sh	2021-10-12 16:11:50.648406016 +0200
+--- entrypoint.sh.orig-as-of-2022-05-03	2022-05-03 09:55:52.331266967 +0200
++++ entrypoint.sh	2022-05-03 09:56:27.879370772 +0200
 @@ -96,11 +96,12 @@
              echo "Upgrading nextcloud from $installed_version ..."
              run_as 'php /var/www/html/occ app:list' | sed -n "/Enabled:/,/Disabled:/p" > /tmp/list_before
@@ -15,6 +15,6 @@
 +        #else
 +        #    rsync_options="-rlD"
 +        #fi
-         rsync $rsync_options --delete --exclude-from=/upgrade.exclude /usr/src/nextcloud/ /var/www/html/
  
-         for dir in config data custom_apps themes; do
+         # If another process is syncing the html folder, wait for
+         # it to be done, then escape initalization
