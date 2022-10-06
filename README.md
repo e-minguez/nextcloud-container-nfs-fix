@@ -24,3 +24,5 @@ The image is already available at https://quay.io/repository/eminguez/nextcloud-
 ```
 podman pull quay.io/eminguez/nextcloud-container-fix-nfs
 ```
+
+Latest version: 24.0.6
