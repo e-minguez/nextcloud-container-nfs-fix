@@ -70,9 +70,6 @@ try {
 		echo "Current user id: " . $user . PHP_EOL;
 		echo "Owner id of config.php: " . $configUser . PHP_EOL;
 		echo "Try adding 'sudo -u #" . $configUser . "' to the beginning of the command (without the single quotes)" . PHP_EOL;
-		echo "If running with 'docker exec' try adding the option '-u " . $configUser . "' to the docker command (without the single quotes)" . PHP_EOL;
-		# TEMP FIX FOR https://github.com/nextcloud/server/issues/24914
-		#exit(1);
 	}
 
 	$oldWorkingDir = getcwd();
@@ -85,8 +82,9 @@ try {
 		exit(1);
 	}
 
-	if (!function_exists('pcntl_signal') && !in_array('--no-warnings', $argv)) {
+	if (!(function_exists('pcntl_signal') && function_exists('pcntl_signal_dispatch')) && !in_array('--no-warnings', $argv)) {
 		echo "The process control (PCNTL) extensions are required in case you want to interrupt long running commands - see https://www.php.net/manual/en/book.pcntl.php" . PHP_EOL;
+		echo "Additionally the function 'pcntl_signal' and 'pcntl_signal_dispatch' need to be enabled in your php.ini." . PHP_EOL;
 	}
 
 	$application = new Application(

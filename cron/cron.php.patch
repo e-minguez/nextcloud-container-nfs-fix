@@ -1,12 +1,11 @@
---- cron.php.orig-as-of-2022-05-03	2022-05-03 09:52:42.202712198 +0200
-+++ cron.php	2022-05-03 09:53:30.638853531 +0200
-@@ -101,7 +101,8 @@
+--- cron.php.orig-as-of-2022-10-06	2022-10-06 12:24:18.000000000 +0200
++++ cron.php	2022-10-06 12:24:18.000000000 +0200
+@@ -101,8 +101,6 @@
+ 		if ($user !== $configUser) {
  			echo "Console has to be executed with the user that owns the file config/config.php" . PHP_EOL;
  			echo "Current user id: " . $user . PHP_EOL;
- 			echo "Owner id of config.php: " . $configUser . PHP_EOL;
+-			echo "Owner id of config.php: " . $configUser . PHP_EOL;
 -			exit(1);
-+			# TEMP FIX FOR https://github.com/nextcloud/server/issues/24915
-+			#exit(1);
  		}
  
  

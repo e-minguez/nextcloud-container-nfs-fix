@@ -64,13 +64,14 @@ try {
 
 	$logger = \OC::$server->getLogger();
 	$config = \OC::$server->getConfig();
+	$tempManager = \OC::$server->getTempManager();
 
 	// Don't do anything if Nextcloud has not been installed
 	if (!$config->getSystemValue('installed', false)) {
 		exit(0);
 	}
 
-	\OC::$server->getTempManager()->cleanOld();
+	$tempManager->cleanOld();
 
 	// Exit if background jobs are disabled!
 	$appMode = $config->getAppValue('core', 'backgroundjobs_mode', 'ajax');
@@ -100,9 +101,6 @@ try {
 		if ($user !== $configUser) {
 			echo "Console has to be executed with the user that owns the file config/config.php" . PHP_EOL;
 			echo "Current user id: " . $user . PHP_EOL;
-			echo "Owner id of config.php: " . $configUser . PHP_EOL;
-			# TEMP FIX FOR https://github.com/nextcloud/server/issues/24915
-			#exit(1);
 		}
 
 
@@ -150,8 +148,10 @@ try {
 
 			$logger->debug('CLI cron call has selected job with ID ' . strval($job->getId()), ['app' => 'cron']);
 			$job->execute($jobList, $logger);
+
 			// clean up after unclean jobs
 			\OC_Util::tearDownFS();
+			$tempManager->clean();
 
 			$jobList->setLastJob($job);
 			$executedJobs[$job->getId()] = true;
@@ -191,4 +191,3 @@ try {
 	echo $ex . PHP_EOL;
 	exit(1);
 }
-

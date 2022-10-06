@@ -1,12 +1,11 @@
---- console.php.orig-as-of-2021-10-12	2021-10-12 16:01:31.856000000 +0200
-+++ console.php	2021-10-12 16:02:15.424189814 +0200
-@@ -71,7 +71,8 @@
+--- console.php.orig-as-of-2022-10-06	2022-10-06 11:57:39.000000000 +0200
++++ console.php	2022-10-06 12:00:37.000000000 +0200
+@@ -70,8 +70,6 @@
+ 		echo "Current user id: " . $user . PHP_EOL;
  		echo "Owner id of config.php: " . $configUser . PHP_EOL;
  		echo "Try adding 'sudo -u #" . $configUser . "' to the beginning of the command (without the single quotes)" . PHP_EOL;
- 		echo "If running with 'docker exec' try adding the option '-u " . $configUser . "' to the docker command (without the single quotes)" . PHP_EOL;
+-		echo "If running with 'docker exec' try adding the option '-u " . $configUser . "' to the docker command (without the single quotes)" . PHP_EOL;
 -		exit(1);
-+		# TEMP FIX FOR https://github.com/nextcloud/server/issues/24914
-+		#exit(1);
  	}
  
  	$oldWorkingDir = getcwd();

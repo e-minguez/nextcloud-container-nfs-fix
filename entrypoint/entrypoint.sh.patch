@@ -1,20 +1,10 @@
---- entrypoint.sh.orig-as-of-2022-05-03	2022-05-03 09:55:52.331266967 +0200
-+++ entrypoint.sh	2022-05-03 09:56:27.879370772 +0200
-@@ -96,11 +96,12 @@
-             echo "Upgrading nextcloud from $installed_version ..."
-             run_as 'php /var/www/html/occ app:list' | sed -n "/Enabled:/,/Disabled:/p" > /tmp/list_before
+--- entrypoint.sh.orig-as-of-2022-10-06	2022-10-06 12:21:39.000000000 +0200
++++ entrypoint.sh	2022-10-06 12:21:39.000000000 +0200
+@@ -124,6 +124,7 @@
+         else
+             rsync_options="-rlD"
          fi
--        if [ "$(id -u)" = 0 ]; then
--            rsync_options="-rlDog --chown www-data:root"
--        else
--            rsync_options="-rlD"
--        fi
-+        rsync_options="-rlD"
-+        #if [ "$(id -u)" = 0 ]; then
-+        #    rsync_options="-rlDog --chown www-data:root"
-+        #else
-+        #    rsync_options="-rlD"
-+        #fi
++	rsync_options="-rlD"
  
          # If another process is syncing the html folder, wait for
-         # it to be done, then escape initalization
+         # it to be done, then escape initalization.
