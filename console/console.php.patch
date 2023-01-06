@@ -1,5 +1,5 @@
---- console.php.orig-as-of-2022-12-20	2022-12-20 17:10:04.000000000 +0100
-+++ console.php	2022-12-20 17:10:04.000000000 +0100
+--- console.php.orig-as-of-2023-01-06	2023-01-06 18:04:41.117642841 +0100
++++ console.php	2023-01-06 18:04:41.120976139 +0100
 @@ -70,8 +70,6 @@
  		echo "Current user id: " . $user . PHP_EOL;
  		echo "Owner id of config.php: " . $configUser . PHP_EOL;
