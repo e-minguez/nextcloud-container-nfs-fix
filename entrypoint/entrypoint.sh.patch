@@ -1,10 +1,10 @@
---- entrypoint.sh.orig-as-of-2023-01-06	2023-01-06 18:05:30.403781378 +0100
-+++ entrypoint.sh	2023-01-06 18:06:02.826767097 +0100
+--- entrypoint.sh.orig-as-of-2024-04-14	2024-04-14 21:51:35
++++ entrypoint.sh	2024-04-14 21:51:35
 @@ -124,6 +124,7 @@
-             rsync_options="-rlD"
-         fi
- 
+             else
+                 echo "session.save_path = \"tcp://${REDIS_HOST}:${REDIS_HOST_PORT:=6379}\""
+             fi
 +	rsync_options="-rlD"
-         # If another process is syncing the html folder, wait for
-         # it to be done, then escape initalization.
-         # You need to define the NEXTCLOUD_INIT_LOCK environment variable
+             echo "redis.session.locking_enabled = 1"
+             echo "redis.session.lock_retries = -1"
+             # redis.session.lock_wait_time is specified in microseconds.

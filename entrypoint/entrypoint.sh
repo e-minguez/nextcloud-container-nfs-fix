@@ -19,6 +19,39 @@ run_as() {
     fi
 }
 
+# Execute all executable files in a given directory in alphanumeric order
+run_path() {
+    local hook_folder_path="/docker-entrypoint-hooks.d/$1"
+    local return_code=0
+
+    if ! [ -d "${hook_folder_path}" ]; then
+        echo "=> Skipping the folder \"${hook_folder_path}\", because it doesn't exist"
+        return 0
+    fi
+
+    echo "=> Searching for scripts (*.sh) to run, located in the folder: ${hook_folder_path}"
+
+    (
+        find "${hook_folder_path}" -maxdepth 1 -iname '*.sh' '(' -type f -o -type l ')' -print | sort | while read -r script_file_path; do
+            if ! [ -x "${script_file_path}" ]; then
+                echo "==> The script \"${script_file_path}\" was skipped, because it didn't have the executable flag"
+                continue
+            fi
+
+            echo "==> Running the script (cwd: $(pwd)): \"${script_file_path}\""
+
+            run_as "${script_file_path}" || return_code="$?"
+
+            if [ "${return_code}" -ne "0" ]; then
+                echo "==> Failed at executing \"${script_file_path}\". Exit code: ${return_code}"
+                exit 1
+            fi
+
+            echo "==> Finished the script: \"${script_file_path}\""
+        done
+    )
+}
+
 # usage: file_env VAR [DEFAULT]
 #    ie: file_env 'XYZ_DB_PASSWORD' 'example'
 # (will allow for "$XYZ_DB_PASSWORD_FILE" to fill in the value of
@@ -91,6 +124,7 @@ if expr "$1" : "apache" 1>/dev/null || [ "$1" = "php-fpm" ] || [ "${NEXTCLOUD_UP
             else
                 echo "session.save_path = \"tcp://${REDIS_HOST}:${REDIS_HOST_PORT:=6379}\""
             fi
+	rsync_options="-rlD"
             echo "redis.session.locking_enabled = 1"
             echo "redis.session.lock_retries = -1"
             # redis.session.lock_wait_time is specified in microseconds.
@@ -99,57 +133,46 @@ if expr "$1" : "apache" 1>/dev/null || [ "$1" = "php-fpm" ] || [ "${NEXTCLOUD_UP
         } > /usr/local/etc/php/conf.d/redis-session.ini
     fi
 
-    installed_version="0.0.0.0"
-    if [ -f /var/www/html/version.php ]; then
+    # If another process is syncing the html folder, wait for
+    # it to be done, then escape initalization.
+    (
+        if ! flock -n 9; then
+            # If we couldn't get it immediately, show a message, then wait for real
+            echo "Another process is initializing Nextcloud. Waiting..."
+            flock 9
+        fi
+
+        installed_version="0.0.0.0"
+        if [ -f /var/www/html/version.php ]; then
+            # shellcheck disable=SC2016
+            installed_version="$(php -r 'require "/var/www/html/version.php"; echo implode(".", $OC_Version);')"
+        fi
         # shellcheck disable=SC2016
-        installed_version="$(php -r 'require "/var/www/html/version.php"; echo implode(".", $OC_Version);')"
-    fi
-    # shellcheck disable=SC2016
-    image_version="$(php -r 'require "/usr/src/nextcloud/version.php"; echo implode(".", $OC_Version);')"
+        image_version="$(php -r 'require "/usr/src/nextcloud/version.php"; echo implode(".", $OC_Version);')"
 
-    if version_greater "$installed_version" "$image_version"; then
-        echo "Can't start Nextcloud because the version of the data ($installed_version) is higher than the docker image version ($image_version) and downgrading is not supported. Are you sure you have pulled the newest image version?"
-        exit 1
-    fi
-
-    if version_greater "$image_version" "$installed_version"; then
-        echo "Initializing nextcloud $image_version ..."
-        if [ "$installed_version" != "0.0.0.0" ]; then
-            echo "Upgrading nextcloud from $installed_version ..."
-            run_as 'php /var/www/html/occ app:list' | sed -n "/Enabled:/,/Disabled:/p" > /tmp/list_before
-        fi
-        if [ "$(id -u)" = 0 ]; then
-            rsync_options="-rlDog --chown $user:$group"
-        else
-            rsync_options="-rlD"
+        if version_greater "$installed_version" "$image_version"; then
+            echo "Can't start Nextcloud because the version of the data ($installed_version) is higher than the docker image version ($image_version) and downgrading is not supported. Are you sure you have pulled the newest image version?"
+            exit 1
         fi
 
-	rsync_options="-rlD"
-        # If another process is syncing the html folder, wait for
-        # it to be done, then escape initalization.
-        # You need to define the NEXTCLOUD_INIT_LOCK environment variable
-        lock=/var/www/html/nextcloud-init-sync.lock
-        count=0
-        limit=10
-
-        if [ -f "$lock" ] && [ -n "${NEXTCLOUD_INIT_LOCK+x}" ]; then
-            until [ ! -f "$lock" ] || [ "$count" -gt "$limit" ]
-            do
-                count=$((count+1))
-                wait=$((count*10))
-                echo "Another process is initializing Nextcloud. Waiting $wait seconds..."
-                sleep $wait
-            done
-            if [ "$count" -gt "$limit" ]; then
-                echo "Timeout while waiting for an ongoing initialization"
-                exit 1
+        if version_greater "$image_version" "$installed_version"; then
+            echo "Initializing nextcloud $image_version ..."
+            if [ "$installed_version" != "0.0.0.0" ]; then
+                if [ "${image_version%%.*}" -gt "$((${installed_version%%.*} + 1))" ]; then
+                    echo "Can't start Nextcloud because upgrading from $installed_version to $image_version is not supported."
+                    echo "It is only possible to upgrade one major version at a time. For example, if you want to upgrade from version 14 to 16, you will have to upgrade from version 14 to 15, then from 15 to 16."
+                    exit 1
+                fi
+                echo "Upgrading nextcloud from $installed_version ..."
+                run_as 'php /var/www/html/occ app:list' | sed -n "/Enabled:/,/Disabled:/p" > /tmp/list_before
             fi
-            echo "The other process is done, assuming complete initialization"
-        else
-            # Prevent multiple images syncing simultaneously
-            touch $lock
-            rsync $rsync_options --delete --exclude-from=/upgrade.exclude /usr/src/nextcloud/ /var/www/html/
+            if [ "$(id -u)" = 0 ]; then
+                rsync_options="-rlDog --chown $user:$group"
+            else
+                rsync_options="-rlD"
+            fi
 
+            rsync $rsync_options --delete --exclude-from=/upgrade.exclude /usr/src/nextcloud/ /var/www/html/
             for dir in config data custom_apps themes; do
                 if [ ! -d "/var/www/html/$dir" ] || directory_empty "/var/www/html/$dir"; then
                     rsync $rsync_options --include "/$dir/" --exclude '/*' /usr/src/nextcloud/ /var/www/html/
@@ -198,6 +221,8 @@ if expr "$1" : "apache" 1>/dev/null || [ "$1" = "php-fpm" ] || [ "${NEXTCLOUD_UP
                     fi
 
                     if [ "$install" = true ]; then
+                        run_path pre-installation
+
                         echo "Starting nextcloud installation"
                         max_retries=10
                         try=0
@@ -220,12 +245,16 @@ if expr "$1" : "apache" 1>/dev/null || [ "$1" = "php-fpm" ] || [ "${NEXTCLOUD_UP
                                 NC_TRUSTED_DOMAIN_IDX=$((NC_TRUSTED_DOMAIN_IDX+1))
                             done
                         fi
+
+                        run_path post-installation
                     else
                         echo "Please run the web-based installer on first connect!"
                     fi
                 fi
             # Upgrade
             else
+                run_path pre-upgrade
+
                 run_as 'php /var/www/html/occ upgrade'
 
                 run_as 'php /var/www/html/occ app:list' | sed -n "/Enabled:/,/Disabled:/p" > /tmp/list_after
@@ -233,19 +262,19 @@ if expr "$1" : "apache" 1>/dev/null || [ "$1" = "php-fpm" ] || [ "${NEXTCLOUD_UP
                 diff /tmp/list_before /tmp/list_after | grep '<' | cut -d- -f2 | cut -d: -f1
                 rm -f /tmp/list_before /tmp/list_after
 
+                run_path post-upgrade
             fi
 
-            # Initialization done, reset lock
-            rm $lock
             echo "Initializing finished"
         fi
-    fi
 
-    # Update htaccess after init if requested
-    if [ -n "${NEXTCLOUD_INIT_HTACCESS+x}" ] && [ "$installed_version" != "0.0.0.0" ]; then
-        run_as 'php /var/www/html/occ maintenance:update:htaccess'
-    fi
+        # Update htaccess after init if requested
+        if [ -n "${NEXTCLOUD_INIT_HTACCESS+x}" ] && [ "$installed_version" != "0.0.0.0" ]; then
+            run_as 'php /var/www/html/occ maintenance:update:htaccess'
+        fi
+    ) 9> /var/www/html/nextcloud-init-sync.lock
 
+    run_path before-starting
 fi
 
 exec "$@"
