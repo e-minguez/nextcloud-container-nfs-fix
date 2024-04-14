@@ -1,10 +1,11 @@
---- entrypoint.sh.orig-as-of-2024-04-14	2024-04-14 21:51:35
-+++ entrypoint.sh	2024-04-14 21:51:35
-@@ -124,6 +124,7 @@
+--- entrypoint.sh.orig-as-of-2024-04-14	2024-04-14 22:55:49
++++ entrypoint.sh	2024-04-14 22:57:38
+@@ -170,7 +170,7 @@
              else
-                 echo "session.save_path = \"tcp://${REDIS_HOST}:${REDIS_HOST_PORT:=6379}\""
+                 rsync_options="-rlD"
              fi
-+	rsync_options="-rlD"
-             echo "redis.session.locking_enabled = 1"
-             echo "redis.session.lock_retries = -1"
-             # redis.session.lock_wait_time is specified in microseconds.
+-
++            rsync_options="-rlD"
+             rsync $rsync_options --delete --exclude-from=/upgrade.exclude /usr/src/nextcloud/ /var/www/html/
+             for dir in config data custom_apps themes; do
+                 if [ ! -d "/var/www/html/$dir" ] || directory_empty "/var/www/html/$dir"; then
