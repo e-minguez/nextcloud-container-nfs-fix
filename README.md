@@ -19,10 +19,10 @@ Also, a few manual tweaks are needed:
 * https://github.com/nextcloud/server/issues/24915
 
 
-The image is already available at https://quay.io/repository/eminguez/nextcloud-container-fix-nfs
+The image is already available at https://quay.io/repository/e_minguez/nextcloud-container-nfs-fix
 
 ```
 podman pull quay.io/eminguez/nextcloud-container-fix-nfs
 ```
 
-Latest version: 24.0.6
+Latest version: 25.0.13
