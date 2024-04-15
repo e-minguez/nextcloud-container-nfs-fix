@@ -1,5 +1,5 @@
---- cron.php.orig-as-of-2024-04-15	2024-04-15 19:03:16
-+++ cron.php	2024-04-15 19:03:16
+--- cron.php.orig-as-of-2024-04-15	2024-04-15 21:40:31
++++ cron.php	2024-04-15 21:40:31
 @@ -101,8 +101,6 @@
  		if ($user !== $configUser) {
  			echo "Console has to be executed with the user that owns the file config/config.php" . PHP_EOL;

@@ -1,5 +1,5 @@
---- entrypoint.sh.orig-as-of-2024-04-15	2024-04-15 19:02:58
-+++ entrypoint.sh	2024-04-15 19:02:58
+--- entrypoint.sh.orig-as-of-2024-04-15	2024-04-15 21:40:11
++++ entrypoint.sh	2024-04-15 21:40:11
 @@ -166,7 +166,7 @@
                  run_as 'php /var/www/html/occ app:list' | sed -n "/Enabled:/,/Disabled:/p" > /tmp/list_before
              fi
