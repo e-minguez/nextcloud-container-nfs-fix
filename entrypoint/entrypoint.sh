@@ -166,11 +166,11 @@ if expr "$1" : "apache" 1>/dev/null || [ "$1" = "php-fpm" ] || [ "${NEXTCLOUD_UP
                 run_as 'php /var/www/html/occ app:list' | sed -n "/Enabled:/,/Disabled:/p" > /tmp/list_before
             fi
             if [ "$(id -u)" = 0 ]; then
-                rsync_options="-rlDog --chown $user:$group"
+                rsync_options="-rlD"
             else
                 rsync_options="-rlD"
             fi
-            rsync_options="-rlD"
+
             rsync $rsync_options --delete --exclude-from=/upgrade.exclude /usr/src/nextcloud/ /var/www/html/
             for dir in config data custom_apps themes; do
                 if [ ! -d "/var/www/html/$dir" ] || directory_empty "/var/www/html/$dir"; then

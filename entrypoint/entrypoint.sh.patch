@@ -1,11 +1,11 @@
---- entrypoint.sh.orig-as-of-2024-04-14	2024-04-14 22:55:49
-+++ entrypoint.sh	2024-04-14 22:57:38
-@@ -170,7 +170,7 @@
+--- entrypoint.sh.orig-as-of-2024-04-15	2024-04-15 14:40:21
++++ entrypoint.sh	2024-04-15 14:45:27
+@@ -166,7 +166,7 @@
+                 run_as 'php /var/www/html/occ app:list' | sed -n "/Enabled:/,/Disabled:/p" > /tmp/list_before
+             fi
+             if [ "$(id -u)" = 0 ]; then
+-                rsync_options="-rlDog --chown $user:$group"
++                rsync_options="-rlD"
              else
                  rsync_options="-rlD"
              fi
--
-+            rsync_options="-rlD"
-             rsync $rsync_options --delete --exclude-from=/upgrade.exclude /usr/src/nextcloud/ /var/www/html/
-             for dir in config data custom_apps themes; do
-                 if [ ! -d "/var/www/html/$dir" ] || directory_empty "/var/www/html/$dir"; then
