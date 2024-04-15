@@ -1,4 +1,4 @@
-FROM docker.io/library/nextcloud:26-fpm-alpine
+FROM docker.io/library/nextcloud:27-fpm-alpine
 COPY entrypoint/entrypoint.sh /
 COPY console/console.php /usr/src/nextcloud/
 COPY cron/cron.php /usr/src/nextcloud/
