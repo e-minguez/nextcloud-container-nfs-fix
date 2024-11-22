@@ -57,12 +57,14 @@ try {
 		exit(1);
 	}
 
+	$config = \OC::$server->getConfig();
 	set_exception_handler('exceptionHandler');
 
 	if (!function_exists('posix_getuid')) {
 		echo "The posix extensions are required - see https://www.php.net/manual/en/book.posix.php" . PHP_EOL;
 		exit(1);
 	}
+
 	$user = posix_getuid();
 	$configUser = fileowner(OC::$configDir . 'config.php');
 	if ($user !== $configUser) {
@@ -88,7 +90,7 @@ try {
 	}
 
 	$application = new Application(
-		\OC::$server->getConfig(),
+		$config,
 		\OC::$server->get(\OCP\EventDispatcher\IEventDispatcher::class),
 		\OC::$server->getRequest(),
 		\OC::$server->get(\Psr\Log\LoggerInterface::class),
