@@ -1,7 +1,7 @@
 https://github.com/nextcloud/server/blob/master/console.php
 
 ```shell
-VERSION="30.0.2"
+VERSION="30.0.3"
 rm -f console.php.orig-as-of-*
 curl https://raw.githubusercontent.com/nextcloud/server/v${VERSION}/console.php -o console.php.orig-as-of-$(date +%Y-%m-%d)
 sed -e '/If running with/,+1d' console.php.orig-as-of-* > console.php
